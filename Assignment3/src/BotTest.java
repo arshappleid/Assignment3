@@ -37,13 +37,7 @@ public class BotTest extends Bot {
 		fail("get_response() methods test failed.");
 
 		test_Bot.setInput("depression");
-		output = "I’m going to ask you a series of questions to access the possibility of you suffering from depression."; // we
-																															// expect
-																															// this
-																															// to
-																															// be
-																															// the
-																															// output.
+		output = "I’m going to ask you a series of questions to access the possibility of you suffering from depression.";
 		test_Bot.getResponse(); // this will change the currentOutput value , so we can later retrieve the
 								// values.
 		actual = test_Bot.getInput();

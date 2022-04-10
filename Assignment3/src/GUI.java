@@ -10,14 +10,19 @@ import java.awt.SystemColor;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
+import wiki.*;
+
 public class GUI {
 
-	//this class creates the Graphical User Interface and uses the bot object to facilitate conversation
+	// this class creates the Graphical User Interface and uses the bot object to
+	// facilitate conversation
 	private JFrame frame;
 	private JTextField input_field;
 	JTextPane chatHistory;
 	JScrollPane scrollPane;
-	static Bot bot=new Bot();
+	static Bot bot = new Bot();
+	String input;
+
 	/**
 	 * Launch the application.
 	 */
@@ -32,8 +37,7 @@ public class GUI {
 				}
 			}
 		});
-		
-		
+
 	}
 
 	/**
@@ -47,87 +51,91 @@ public class GUI {
 	 * Initialize the contents of the frame.
 	 */
 	private void initialize() {
-		
+
 		frame = new JFrame();
-		frame.setBounds(100, 100, 450, 300);
+		frame.setBounds(100, 100, 550, 400);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		
+
 		input_field = new JTextField();
 		chatHistory = new JTextPane();
 		chatHistory.setEditable(false);
-		
+
 		chatHistory.setBackground(SystemColor.menu);
 		scrollPane = new JScrollPane();
 		frame.getContentPane().add(scrollPane, BorderLayout.CENTER);
 		scrollPane.setViewportView(chatHistory);
+
 		events();
 		frame.getContentPane().add(input_field, BorderLayout.SOUTH);
 		input_field.setColumns(10);
 		bot.greet();
 		output(bot.getOutput());
-		
-		
-		
+
 	}
+
 	private void events() {
-		
+
 		input_field.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				String input=input_field.getText();
-				bot.setOutput(bot.name+": "+input);
-				//bot.removePunc();
+				String input = input_field.getText();
+				bot.setOutput(bot.name + ": " + input); // show the user input on the gui screen
+				// bot.removePunc();
 				output(bot.getOutput());
-				bot.setInput(input);
-				input_field.setText("");
+				bot.setInput(input); // set the input , string to bots current input.
+				input_field.setText(""); // clear the input field after.
+
 				bot.exchange_count++;
-				if(bot.exchange_count==1) {
-					bot.optimizeInput();
-					bot.name=PoSTagger.getProperNoun(input);
-					if(bot.name=="") {
+				if (bot.exchange_count <= 1) {
+					// in the first exchange count, check if we were able to get the name right.
+					// bot.optimizeInput();
+					bot.name = PoSTagger.getProperNoun(input);
+					if (bot.name == "") // just in case the getProperNoun library fails
+						bot.name = input;
+					if (input == "") {
 						output("Serenity: I'm going to need your name before we continue!");
-						bot.name="User";
-						bot.exchange_count--;
+						bot.name = "User";
+					} else {
+						bot.setOutput("Serenity: Nice to meet you " + bot.name + " :) How's it going?");
+						output(bot.getOutput());
 					}
-					else {
-					bot.setOutput("Serenity: Nice to meet you "+bot.name +" :) How's it going?");
-					output(bot.getOutput());
-					}
-				}
-				else if(input=="") {
-					
-				}
-				else {
+				} else if (input == "") {
+					bot.name = "User";
+				} else {
 					bot.optimizeInput();
-					
-					if(bot.check_goodbye()) {
+					if (bot.check_goodbye()) {
 						bot.goodbye();
-						output("Serenity: "+bot.getOutput());
-					}
-					else {
+						output("Serenity: " + bot.getOutput());
+					} else {
 						bot.updateMoodScore();
 						bot.getResponse();
-						output("Serenity: "+bot.getOutput());
+						output("Serenity: " + bot.getOutput());
 					}
-					if(bot.exchange_count>15 && bot.exchange_count%8==0) {
-						
-						switch((int) (3*Math.random())) {
-						case 0: {bot.inform();output("Serenity: "+bot.getOutput());}
-						break;
-						case 1: {bot.affirm();output("Serenity: "+bot.getOutput());}
-						break;
-						case 2: {bot.suggestHelp();output("Serenity: "+bot.getOutput());}
+					if (bot.exchange_count > 15 && bot.exchange_count % 8 == 0) {
+
+						switch ((int) (3 * Math.random())) {
+							case 0: {
+								bot.inform();
+								output("Serenity: " + bot.getOutput());
+							}
+								break;
+							case 1: {
+								bot.affirm();
+								output("Serenity: " + bot.getOutput());
+							}
+								break;
+							case 2: {
+								bot.suggestHelp();
+								output("Serenity: " + bot.getOutput());
+							}
 						}
-						
 					}
-					
-					
 				}
 			}
 		});
-		
 	}
+
 	private void output(String s) {
-		chatHistory.setText(chatHistory.getText()+s+"\n");
+		chatHistory.setText(chatHistory.getText() + s + "\n");
 	}
 
 }
